@@ -223,9 +223,76 @@ describe("Pokemon API Server", () => {
 
   describe("POST /api/pokemon - adding pokemon", () => {
     it("should add pokemon to pokemon.json", async () => {
-      const res = await request.post("/api/pokemon").send({ sample: "sample" });
+      // define a sample data
+
+      const newPokemon = {
+        id: "152",
+        name: "Genta",
+        classification: "Seed Pokémon",
+        types: ["Grass", "Poison"],
+        resistant: ["Water", "Electric", "Grass", "Fighting", "Fairy"],
+        weaknesses: ["Fire", "Ice", "Flying", "Psychic"],
+        weight: {
+          minimum: "6.04kg",
+          maximum: "7.76kg",
+        },
+        height: {
+          minimum: "0.61m",
+          maximum: "0.79m",
+        },
+        fleeRate: 0.1,
+        evolutionRequirements: {
+          amount: 25,
+          name: "Bulbasaur candies",
+        },
+        evolutions: [
+          {
+            id: 2,
+            name: "Ivysaur",
+          },
+          {
+            id: 3,
+            name: "Venusaur",
+          },
+        ],
+        maxCP: 951,
+        maxHP: 1071,
+        attacks: {
+          fast: [
+            {
+              name: "Tackle",
+              type: "Normal",
+              damage: 12,
+            },
+            {
+              name: "Vine Whip",
+              type: "Grass",
+              damage: 7,
+            },
+          ],
+          special: [
+            {
+              name: "Power Whip",
+              type: "Grass",
+              damage: 70,
+            },
+            {
+              name: "Seed Bomb",
+              type: "Grass",
+              damage: 40,
+            },
+            {
+              name: "Sludge Bomb",
+              type: "Poison",
+              damage: 55,
+            },
+          ],
+        },
+      };
+
+      const res = await request.post("/api/pokemon").send(newPokemon);
       res.should.be.json;
-      JSON.parse(res.text).should.deep.equal({ sample: "sample" });
+      JSON.parse(res.text).should.deep.equal(newPokemon);
     });
   });
 
@@ -240,7 +307,105 @@ describe("Pokemon API Server", () => {
   describe("GET /api/pokemon/:name - return pokemon", () => {
     it("should return pokemon that name is the same", async () => {
       const res = await request.get("/api/pokemon/Mew");
+      // console.log(res.text);
+      // res.should.be.json;
+      // JSON.parse(res.text).should.deep.equal({ sample: "sample" });
+    });
+  });
+
+  describe("PATCH /api/pokemon/:idOrName - make partial modifications to a Pokemon", () => {
+    it("should change pokemon's attributes that name or id is the same", async () => {
+      const res = await request.patch("/api/pokemon/42").query({
+        name: "Genta",
+        classification: "human",
+        "Previous evolution(s)": [{ id: 155, name: "Takuya" }],
+      });
+      // console.log(res.text);
+      // res.should.be.json;
+      // JSON.parse(res.text).should.deep.equal({ sample: "sample" });
+    });
+  });
+
+  describe("GET /api/pokemon/:idOrName/evolutions - get evolutions", () => {
+    it("should get pokemon's evolutions", async () => {
+      const res = await request.get("/api/pokemon/Staryu/evolutions");
+      // console.log(res.text);
+      // res.should.be.json;
+      // JSON.parse(res.text).should.deep.equal({ sample: "sample" });
+    });
+  });
+
+  describe("GET /api/types - get types", () => {
+    it("should get pokemon's types", async () => {
+      const res = await request.get("/api/types").query({ limit: "3" });
+      // console.log(res.text);
+      // res.should.be.json;
+      // JSON.parse(res.text).should.deep.equal({ sample: "sample" });
+    });
+  });
+
+  describe("POST /api/types - adding types", () => {
+    it("should add types", async () => {
+      // define a sample data
+
+      const newTypes = { types: ["human", "alien"] };
+
+      const res = await request.post("/api/types").send(newTypes);
       res.should.be.json;
+      JSON.parse(res.text).should.deep.equal(newTypes);
+    });
+  });
+
+  describe("DELETE /api/types/:name - delete types", () => {
+    it("should delete types", async () => {
+      // define a sample data
+      const res = await request.delete("/api/types/Grass");
+      res.should.be.json;
+      JSON.parse(res.text).should.deep.equal();
+    });
+  });
+
+  describe("GET /api/types/:type/pokemon - select pokemon", () => {
+    it("should select pokemon that has the same type", async () => {
+      // define a sample data
+      const res = await request.get("/api/types/Grass/pokemon");
+      res.should.be.json;
+      // JSON.parse(res.text).should.deep.equal();
+    });
+  });
+
+  describe("GET /api/attacks/:name/pokemon - select pokemon", () => {
+    it("should select pokemon that has the same attacks name", async () => {
+      // define a sample data
+      const res = await request.get("/api/attacks/Vine Whip/pokemon");
+      res.should.be.json;
+      // JSON.parse(res.text).should.deep.equal();
+    });
+  });
+
+  describe("POST /api/attacks/fast - add an attack", () => {
+    it("should add an attack", async () => {
+      // define a sample data
+      const res = await request.post("/api/attacks/fast").send({
+        name: "Tackle",
+        type: "Normal",
+        damage: 12,
+      });
+      res.should.be.json;
+      // JSON.parse(res.text).should.deep.equal();
+    });
+  });
+
+  describe("PATCH /api/attacks/:name - make partial modifications to a Pokemon", () => {
+    it("should modifies specified attack", async () => {
+      const res = await request.patch("/api/attacks/Tackle").query({
+        name: "Tackle",
+        type: "Special",
+        damage: 1000,
+      });
+      res.should.be.json;
+      // console.log(res.text);
+      // res.should.be.json;
       // JSON.parse(res.text).should.deep.equal({ sample: "sample" });
     });
   });
